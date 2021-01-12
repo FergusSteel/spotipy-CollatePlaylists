@@ -1,0 +1,6 @@
+# To Do List
+
+1. Create function to remove duplicates <- what im doing
+2. Create UI - with option to keep/remove duplicates + insert user ID
+3. Host on GitHub :)
+4. Efficiency maybe idk if i can be bothered 
