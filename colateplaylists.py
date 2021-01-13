@@ -7,8 +7,8 @@ import math
 
 # Authorization FLow
 scope = "playlist-modify-public user-library-read playlist-read-collaborative playlist-read-private"
-user = "implementthislater"#input("insert Spotify UserID") #Place UserID here ,
-token = util.prompt_for_user_token(user,scope,client_id="66cffc2706ab4a6fad63ece54c37e7ab",client_secret="fixthislater",redirect_uri='fixthislater')
+user = ""#input("insert Spotify UserID") #Place UserID here ,
+token = util.prompt_for_user_token(user,scope,client_id="66cffc2706ab4a6fad63ece54c37e7ab",client_secret="idkhow secret this is meant to be",redirect_uri='http://localhost:8080')
 sp = spotipy.Spotify(auth=token)
 
 
@@ -28,7 +28,6 @@ def getPlaylistIDS(userID):
 
 #Function to create list of track IDS from Playlist ID
 def get_playlist_trackIDS(playlist_id):
-    print(playlist_id)
     trackIDS = []
     tracks = sp.playlist_tracks(playlist_id)
     if tracks["items"] != []:
@@ -44,42 +43,31 @@ def get_playlist_trackIDS(playlist_id):
         return trackIDS
 
 # Function to add tracks to playlist from list of playlists
-def populate_playlist(playlists, playlistID):
+#I think i just redo this function, use .extend on calling get_playlist_trackIDS() and then iterate over that using the math.floor(x/100) or whatever it is
+# if duplicates are on then do it normally if they are off simply make the list a set then do it.
+def get_tracklist(playlists):
     total = 0
     fulltracklist = []
-    while total < 184:
-        for playlist in playlists:
-            x = playlist
-            tracks = get_playlist_trackIDS(x)
-            fulltracklist.extend(tracks)
+    for playlist in playlists:
+        tracks = get_playlist_trackIDS(playlist)
             # Deleted Track
-            if tracks == None:
-                continue
+        if tracks == None:
+            continue
             # Plalylists with 100 or less songs
-            elif len(tracks) <= 100:
-                sp.user_playlist_add_tracks(user, playlistID, tracks)
-            # Longer Playlists
-            else:
-                tracklists = []
-                for iteration in range(math.floor(len(tracks)/100)):
-                    tracklists.append(tracks[100*iteration:(100*iteration)+100])
-                tracklists.append(tracks[100*len(tracklists):])
-                for list in tracklists:
-                    if len(list) > 0:
-                        sp.user_playlist_add_tracks(user, playlistID, list)
-            total += 1
-        return fulltracklist
-
-def remove_duplicates(playlistID, tracks):
-    #get list of duplicate songs
-    #remove all occ. of found songs
-    #re-add songs
-    return
+        else:
+            fulltracklist.extend(tracks)
+    return fulltracklist
 
 # Call
 def main(userID=user, removeDuplicates=True):
     playlists = getPlaylistIDS(userID)
-    x = sp.user_playlist_create(userID, name="BIG PLAYLIST ITS SO BIG", description="For Shuffling")
-    tracklist = populate_playlist(playlists, x["id"])
+    x = sp.user_playlist_create(userID, name="BIG PLAYLIST ITS SO BIG", description="its so big")
+    tracklist = get_tracklist(playlists)
+    if removeDuplicates:
+        tracklist = set(tracklist)
+    #add tracks
+    for cent_tracks in range(math.floor(len(tracklist)/100)):
+        sp.user_playlist_add_tracks(user, x["id"], tracklist[100*cent_tracks:(100*cent_tracks)+100])
+    sp.user_playlist_add_tracks(user, x["id"], tracklist[math.floor(len(tracklist)/100)*100:])
 
 main()
