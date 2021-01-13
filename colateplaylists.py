@@ -65,6 +65,7 @@ def main(userID=user, removeDuplicates=True):
     tracklist = get_tracklist(playlists)
     if removeDuplicates:
         tracklist = set(tracklist)
+        tracklist = list(tracklist)
     #add tracks
     for cent_tracks in range(math.floor(len(tracklist)/100)):
         sp.user_playlist_add_tracks(user, x["id"], tracklist[100*cent_tracks:(100*cent_tracks)+100])
