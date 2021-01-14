@@ -1,6 +1,3 @@
 # To Do List
 
-######################################################################IF DUPLICATES ARE OFF JUST USE A DIFFERENT FUNCTION THAT CONVERTS TRACK LIST TO SET (dont iterate over all the playlists and add by playlist create one big list and make it a set IT WORKS LETS GOOOOOOOOO
-2. Create UI - with option to keep/remove duplicates + insert user ID
-3. Host on GitHub :)
-4. Efficiency maybe idk if i can be bothered
+1. How the fuck do I do front-end dev

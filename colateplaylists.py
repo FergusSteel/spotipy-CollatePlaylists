@@ -4,11 +4,12 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import spotipy.util as util
 from pprint import pprint
 import math
+import cgitb
 
 # Authorization FLow
 scope = "playlist-modify-public user-library-read playlist-read-collaborative playlist-read-private"
 user = ""#input("insert Spotify UserID") #Place UserID here ,
-token = util.prompt_for_user_token(user,scope,client_id="66cffc2706ab4a6fad63ece54c37e7ab",client_secret="idkhow secret this is meant to be",redirect_uri='http://localhost:8080')
+token = util.prompt_for_user_token(user,scope,client_id="66cffc2706ab4a6fad63ece54c37e7ab",client_secret="",redirect_uri='http://localhost:8080')
 sp = spotipy.Spotify(auth=token)
 
 
@@ -43,8 +44,6 @@ def get_playlist_trackIDS(playlist_id):
         return trackIDS
 
 # Function to add tracks to playlist from list of playlists
-#I think i just redo this function, use .extend on calling get_playlist_trackIDS() and then iterate over that using the math.floor(x/100) or whatever it is
-# if duplicates are on then do it normally if they are off simply make the list a set then do it.
 def get_tracklist(playlists):
     total = 0
     fulltracklist = []
@@ -58,11 +57,29 @@ def get_tracklist(playlists):
             fulltracklist.extend(tracks)
     return fulltracklist
 
+#Add functionality to add liked songs to the playlist aswell :)
+def get_saved_songs(user):
+    tracks = sp.current_user_saved_tracks()
+    likedsongs = []
+    if tracks["items"] != []:
+        while tracks:
+            for track in tracks["items"]:
+                curtrack = track["track"]
+                if curtrack["id"] != None and curtrack["type"] == "track":
+                    likedsongs.append(curtrack["id"])
+            if tracks['next'] != None:
+                tracks = sp.next(tracks)
+            else:
+                tracks = None
+    print(likedsongs)
+    return likedsongs
 # Call
-def main(userID=user, removeDuplicates=True):
+def main(userID=user, removeDuplicates=True, addSavedSongs=True):
     playlists = getPlaylistIDS(userID)
     x = sp.user_playlist_create(userID, name="BIG PLAYLIST ITS SO BIG", description="its so big")
     tracklist = get_tracklist(playlists)
+    if addSavedSongs:
+        tracklist.extend(get_saved_songs(userID))
     if removeDuplicates:
         tracklist = set(tracklist)
         tracklist = list(tracklist)
